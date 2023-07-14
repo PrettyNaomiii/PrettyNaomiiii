@@ -1,0 +1,98 @@
+package UAS_2C;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class MainProgram {
+    public static void main(String[] args) {
+        String url = "http://dummyjson.com/products/category/smartphone";
+        String xConsId = "harber123";
+        String xUserKey = "_tabc4XbR";
+
+        try {
+            // Membuat objek URL
+            URL object = new URL(url);
+
+            // Membuat objek HttpURLConnection
+            HttpURLConnection connection = (HttpURLConnection) object.openConnection();
+
+            // Set header HTTP
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("x-cons-id", xConsId);
+            connection.setRequestProperty("x-userkey", xUserKey);
+
+
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Membaca response dari URL
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                public
+                JSONArray jsonArray = new JSONArray(response.toString());
+
+                // Menampilkan data JSON
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String productName = jsonObject.getString("productName");
+                    String category = jsonObject.getString("category");
+                    double price = jsonObject.getDouble("price");
+
+                    System.out.println("Product Name: " + productName);
+                    System.out.println("Category: " + category);
+                    System.out.println("Price: " + price);
+                    System.out.println();
+                }
+
+                // Melakukan sorting menggunakan selection sort berdasarkan harga (price)
+                int n = jsonArray.length();
+                for (int i = 0; i < n - 1; i++) {
+                    int minIndex = i;
+                    for (int j = i + 1; j < n; j++) {
+                        double price1 = jsonArray.getJSONObject(j).getDouble("price");
+                        double price2 = jsonArray.getJSONObject(minIndex).getDouble("price");
+                        if (price1 < price2) {
+                            minIndex = j;
+                        }
+                    }
+                    if (minIndex != i) {
+                        // Tukar posisi elemen
+                        JSONObject temp = jsonArray.getJSONObject(i);
+                        jsonArray.put(i, jsonArray.getJSONObject(minIndex));
+                        jsonArray.put(minIndex, temp);
+                    }
+                }
+
+                // Menampilkan hasil sorting
+                System.out.println("Hasil Sorting:");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String productName = jsonObject.getString("productName");
+                    String category = jsonObject.getString("category");
+                    double price = jsonObject.getDouble("price");
+
+                    System.out.println("Product Name: " + productName);
+                    System.out.println("Category: " + category);
+                    System.out.println("Price: " + price);
+                    System.out.println();
+                }
+            } else {
+                System.out.println("Error: " + responseCode);
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+    }
+}
